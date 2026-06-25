@@ -53,7 +53,7 @@ app.secret_key = os.environ.get("PANEL_SECRET_KEY") or os.urandom(24)
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Strict',
-    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SECURE=os.environ.get("SESSION_COOKIE_SECURE", "true").lower() == "true",
     PERMANENT_SESSION_LIFETIME=604800,
     MAX_CONTENT_LENGTH=50 * 1024 * 1024
 )
