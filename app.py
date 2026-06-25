@@ -472,12 +472,39 @@ def append_installed(pkg):
         pass
 
 def parse_missing_name(e):
-    n = getattr(e, "name", None)
-    if n: return n
     s = str(e)
     m = re.search(r"No module named \\'([^\\']+)\\'", s)
     if m: return m.group(1)
+    m = re.search(r"cannot import name \\'[^\\']+\\' from \\'([^\\']+)\\'", s)
+    if m: return m.group(1)
+    n = getattr(e, "name", None)
+    if n: return n
     return None
+
+IMPORT_TO_PKG = {{
+    "telegram": "python-telegram-bot",
+    "telegram.ext": "python-telegram-bot",
+    "telegram.request": "python-telegram-bot",
+    "discord": "discord.py",
+    "flask_cors": "Flask-Cors",
+    "flask_login": "Flask-Login",
+    "flask_sqlalchemy": "Flask-SQLAlchemy",
+    "flask_socketio": "Flask-SocketIO",
+    "PIL": "Pillow",
+    "cv2": "opencv-python",
+    "sklearn": "scikit-learn",
+    "skimage": "scikit-image",
+    "yaml": "PyYAML",
+    "bs4": "beautifulsoup4",
+    "git": "GitPython",
+    "dotenv": "python-dotenv",
+    "Crypto": "pycryptodome",
+    "dateutil": "python-dateutil",
+}}
+
+def resolve_pkg(mod_name):
+    top = mod_name.split(".")[0]
+    return IMPORT_TO_PKG.get(top, IMPORT_TO_PKG.get(mod_name, mod_name))
 
 while True:
     try:
@@ -488,16 +515,41 @@ while True:
         if not pkg:
             traceback.print_exc()
             break
-        print(f"[AUTO] Missing: {{pkg}} -> installing...")
+        install_name = resolve_pkg(pkg)
+        print(f"[AUTO] Missing: {pkg} -> installing {install_name}...")
         try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", pkg])
-            append_installed(pkg)
-            print(f"[AUTO] Installed: {{pkg}} -> restarting...")
+            top_mod = pkg.split('.')[0]
+            if top_mod != install_name:
+                subprocess.check_call([sys.executable, "-m", "pip", "uninstall", "-y", top_mod], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            subprocess.check_call([sys.executable, "-m", "pip", "install", install_name])
+            append_installed(install_name)
+            print(f"[AUTO] Installed: {install_name} -> restarting...")
             continue
         except Exception as ex:
-            print(f"[AUTO] Failed: {{ex}}")
+            print(f"[AUTO] Failed: {ex}")
             traceback.print_exc()
             break
+    except ImportError as e:
+        print(f"[AUTO] ImportError: {e}")
+        pkg = parse_missing_name(e)
+        if pkg:
+            install_name = resolve_pkg(pkg)
+            if install_name != pkg:
+                print(f"[AUTO] Re-trying with: {install_name}")
+                try:
+                    top_mod = pkg.split('.')[0]
+                    subprocess.check_call([sys.executable, "-m", "pip", "uninstall", "-y", top_mod], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                    subprocess.check_call([sys.executable, "-m", "pip", "install", install_name])
+                    append_installed(install_name)
+                    print(f"[AUTO] Installed: {install_name} -> restarting...")
+                    continue
+                except:
+                    pass
+        traceback.print_exc()
+        break
+    except Exception:
+        traceback.print_exc()
+        break
     except Exception:
         traceback.print_exc()
         break
