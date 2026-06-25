@@ -136,7 +136,13 @@ def get_state(key):
 
 def log_append(key, text):
     try:
-        owner, folder = parse_server_key(key, allow_admin=True)
+        if "::" in key:
+            owner, folder = key.split("::", 1)
+            owner = owner.strip()
+            folder = folder.strip()
+        else:
+            owner = current_username()
+            folder = key
         p = os.path.join(get_server_dir(owner, folder), "server.log")
         with open(p, "a", encoding="utf-8", errors="ignore") as f:
             f.write(text)
@@ -931,12 +937,13 @@ def server_stats(key):
 
 
 def background_start(key, owner, folder, startup_file):
+    log_key = f"{owner}::{folder}"
     try:
         set_state(key, "Installing")
-        log_append(key, "[SYSTEM] Preparing...\n")
+        log_append(log_key, "[SYSTEM] Preparing...\n")
         ensure_requirements_installed(owner, folder)
         set_state(key, "Starting")
-        log_append(key, "[SYSTEM] Starting...\n")
+        log_append(log_key, "[SYSTEM] Starting...\n")
         proc, logf = start_with_autoinstall(owner, folder, startup_file)
         running_procs[key] = (proc, logf)
         time.sleep(1.0)
@@ -945,7 +952,7 @@ def background_start(key, owner, folder, startup_file):
         else:
             set_state(key, "Offline")
     except Exception as e:
-        log_append(key, f"[SYSTEM] Start failed: {e}\n")
+        log_append(log_key, f"[SYSTEM] Start failed: {e}\n")
         set_state(key, "Offline")
 
 
