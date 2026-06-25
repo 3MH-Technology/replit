@@ -409,7 +409,7 @@
   </div>
 
   <script>
-    let currentSrv = null, poll = null, currentFile = null, currentPath = '';
+      let currentSrv = null, poll = null, currentFile = null, currentPath = '', isAdmin = false;
 
     function escapeHtml(s) { return (s || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
     function escapeAttr(s) { return escapeHtml(s).replace(/\\/g, "\\\\"); }
@@ -425,6 +425,7 @@
 
       fetch('/api/user/profile').then(res => res.json()).then(data => {
         if (data.success) {
+          isAdmin = data.is_admin;
           document.getElementById('billingPanel').style.display = 'flex';
           document.getElementById('pName').textContent = data.username.toUpperCase();
           document.getElementById('pPlan').textContent = data.plan_label.toUpperCase();
@@ -446,7 +447,7 @@
         let sub = s.subtitle || 'NO PROTOCOL';
         let expHtml = '';
 
-        if (s.last_renewed) {
+        if (s.last_renewed && !isAdmin) {
           const days = (Date.now() / 1000 - s.last_renewed) / (24 * 3600);
           if (days > 4) {
             sub = `<span style="color:var(--error)">EXPIRED / انتهت الصلاحية</span>`;

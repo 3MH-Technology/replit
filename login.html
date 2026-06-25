@@ -274,11 +274,10 @@
         }
 
         if (d.skip_otp) {
-          m.style.color = "#FF9F0A";
-          m.textContent = d.message || 'ACCOUNT CREATED / تم إنشاء الحساب';
-          lb.style.display = 'none';
-          document.getElementById('regStep1').style.display = 'none';
-          bt.style.display = 'none';
+          m.style.color = "#32D74B";
+          m.textContent = 'ACCOUNT CREATED. REDIRECTING...';
+          bt.textContent = 'INITIALIZING...';
+          setTimeout(() => { window.location.href = './'; }, 800);
           return;
         }
 
