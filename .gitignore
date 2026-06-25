@@ -5,3 +5,6 @@ DATA/
 USERS/
 *.log
 .env
+test_*.py
+app_output.log
+app_error.log
