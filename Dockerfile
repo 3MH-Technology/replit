@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     dnsutils \
     ca-certificates \
     curl \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m -u 1000 user
