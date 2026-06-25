@@ -506,6 +506,11 @@ def resolve_pkg(mod_name):
     top = mod_name.split(".")[0]
     return IMPORT_TO_PKG.get(top, IMPORT_TO_PKG.get(mod_name, mod_name))
 
+try:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+except:
+    pass
+
 while True:
     try:
         runpy.run_path(script, run_name="__main__")
