@@ -454,7 +454,10 @@ try:
     import dns_fix
 except:
     pass
-import runpy, subprocess, traceback, re
+import runpy, subprocess, traceback, re, logging
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
 script = sys.argv[1]
 cwd = os.getcwd()
 
