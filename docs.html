@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>استضافة الذئب | مركز المساعدة ودليل الاستخدام</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
+
+        :root {
+            --bg: #050505;
+            --card-bg: rgba(20, 20, 25, 0.7);
+            --primary: #0A84FF;
+            --text: #FFFFFF;
+            --text-muted: #8E8E93;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); }
+
+        nav { padding: 24px 5%; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .brand { font-weight: 800; font-size: 20px; color: white; text-decoration: none; display: flex; align-items: center; gap: 12px; }
+        .brand img { width: 40px; border-radius: 10px; }
+
+        .page-header { background: rgba(10, 132, 255, 0.05); text-align: center; padding: 80px 20px; border-bottom: 1px solid var(--border); }
+        .page-header h1 { font-size: 40px; margin-bottom: 16px; font-weight: 900; }
+
+        .container { display: flex; max-width: 1200px; margin: 0 auto; padding: 40px 20px; gap: 40px; }
+
+        .sidebar { width: 250px; position: sticky; top: 100px; height: max-content; }
+        .sidebar ul { list-style: none; }
+        .sidebar li { margin-bottom: 12px; }
+        .sidebar a { color: var(--text-muted); text-decoration: none; transition: color 0.3s; font-weight: 500; font-size: 16px; }
+        .sidebar a:hover { color: var(--primary); }
+
+        .content { flex-grow: 1; max-width: 800px; line-height: 1.8; color: var(--text-muted); font-size: 16px; }
+
+        h2 { color: white; margin: 40px 0 20px; font-size: 28px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+        h2:first-child { margin-top: 0; }
+        p { margin-bottom: 20px; }
+
+        .how-to-box { background: var(--card-bg); border: 1px solid var(--border); padding: 24px; border-radius: 16px; margin-bottom: 24px; }
+        .how-to-box h4 { color: white; font-size: 18px; margin-bottom: 12px; }
+
+        .step { display: flex; gap: 16px; margin-bottom: 16px; }
+        .step-num { width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+
+        code { background: rgba(255, 255, 255, 0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #ffeb3b; }
+
+        @media(max-width: 768px) { .container { flex-direction: column; } .sidebar { width: 100%; position: static; border-bottom: 1px solid var(--border); padding-bottom: 20px; } }
+    </style>
+</head>
+<body>
+    <nav>
+        <a onclick="location.href='/'" class="brand">
+            <img src="https://f.top4top.io/p_37210bgwm1.jpg"> استضافة الذئب
+        </a>
+        <a onclick="location.href='/login'" style="color:var(--primary); font-weight:bold; text-decoration:none">تسجيل الدخول</a>
+    </nav>
+
+    <div class="page-header">
+        <h1>دليل الاستخدام ومركز المساعدة</h1>
+        <p style="color: var(--text-muted); font-size: 18px">تعلم كيفية تجهيز، إدارة وإطلاق بوتك بكل سهولة وسرعة</p>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <ul>
+                <li><a href="#start">1. كيف تبدأ؟</a></li>
+                <li><a href="#upload">2. طريقة رفع البوت</a></li>
+                <li><a href="#run">3. التشغيل والمتابعة</a></li>
+                <li><a href="#errors">4. حل الأخطاء الشائعة</a></li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <h2 id="start">1. مرحباً بك – كيف تبدأ رحلتك؟</h2>
+            <p>لبدء تشغيل بوتك يجب أن تمتلك حساباً على المنصة. لا يتطلب منك التسجيل تأكيد بريد إلكتروني، فقط أدخل اسم مستخدم وكلمة مرور للدخول للوحة التحكم الأساسية الخاصة بك (Dashboard).</p>
+
+            <h2 id="upload">2. طريقة رفع وإعداد البوت</h2>
+            <div class="how-to-box">
+                <h4>خطوات تجهيز مشروعك:</h4>
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div>اضغط على "إضافة محرك جديد" (+ New Engine) وأطلق عليه اسماً لتمييزه عن باقي الأجهزة الافتراضية.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div>قم بالدخول للملفات واسحب ملفات لغة البايثون <code>.py</code> لمربع الرفع أو أنشئ ملف جديد.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div><strong>هام:</strong> اكتب اسم الملف الرئيسي لبوتك في المكان المخصص لـ Entrypoint (مثلاً: <code>bot.py</code>) حتى يعلم النظام من أين يقلع السيرفر.</div>
+                </div>
+            </div>
+
+            <p>لا تنسَ وضع التوكن الخاص في الملف أو استخدام متغيرات النظام (Environment Variables) إذا كان الكود يدعمها.</p>
+
+            <h2 id="run">3. التشغيل ومتابعة التحديثات الحية</h2>
+            <p>بعد تعيين الملف الرئيسي، يمكنك النقر على زر "إقلاع / Start".</p>
+            <p>ستقوم استضافة الذئب بقراءة الملفات وإن كُشفت مكتبات غير مثبتة (مثل Telethon أو Requests) سيتم تنزيلها أوتوماتيكياً بفضل تقنية Auto-Install.</p>
+            <p>افتح نافذة <strong>Terminal / Logs</strong> الخاصة بالبوت لرؤية مخرجات الطرفية والأخطاء (إن وجدت) والمخرجات المطبوعة بـ <code>print</code>.</p>
+
+            <h2 id="errors">4. حل الأخطاء الشائعة والمشاكل المعتادة</h2>
+            <p><strong>- خطأ <code>ModuleNotFoundError</code> لا يزول؟</strong><br> هذا يعني أن النظام واجه مشكلة أثناء التثبيت التلقائي للمكتبة، يُفضل إنشاء ملف <code>requirements.txt</code> ووضع أسماء المكتبات داخله.</p>
+            <p><strong>- السيرفر بحالة (Offline) باستمرار؟</strong><br> غالباً كود البوت مكتوب بطريقة خاطئة فيتوقف لحظة تشغيله، راجع قسم السجلات لمعرفة رسالة الخطأ.</p>
+            <p><strong>- تم حظر الملفات الخاصة بي؟</strong><br> إذا تم استهلاك المساحة أو استخدام سيرفرك لأغراض ضارة (سبام) سيضطر الإداريين لإيقافه. يمكنك التواصل عبر تلجرام لفك الحظر إذا كان هناك سوء فهم.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>استضافة الذئب | منصة استضافة بوتات التلجرام</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
+
+        :root {
+            --bg: #050505;
+            --card-bg: rgba(20, 20, 25, 0.7);
+            --primary: #0A84FF;
+            --primary-glow: rgba(10, 132, 255, 0.4);
+            --accent: #5E5CE6;
+            --text: #FFFFFF;
+            --text-muted: #8E8E93;
+            --border: rgba(255, 255, 255, 0.08);
+            --success: #32D74B;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: float 15s infinite alternate;
+        }
+
+        .orb-1 {
+            top: -20%;
+            right: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: var(--primary-glow);
+        }
+
+        .orb-2 {
+            bottom: -20%;
+            left: -10%;
+            width: 40vw;
+            height: 40vw;
+            background: rgba(94, 92, 230, 0.2);
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(5%, 5%) scale(1.1); }
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            border-bottom: 1px solid var(--border);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(20px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 24px;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .brand img {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            background: #0071E3;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(10, 132, 255, 0.3);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: none;
+        }
+
+        header {
+            text-align: center;
+            padding: 180px 20px 100px;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 72px;
+            font-weight: 900;
+            margin-bottom: 24px;
+            line-height: 1.2;
+            background: linear-gradient(180deg, #FFFFFF 0%, #A1A1A6 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            font-size: 22px;
+            color: var(--text-muted);
+            margin-bottom: 48px;
+            line-height: 1.7;
+            max-width: 800px;
+            margin-inline: auto;
+        }
+
+        .header-btns {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        section {
+            padding: 100px 5%;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .sec-title {
+            text-align: center;
+            font-size: 44px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .sec-desc {
+            text-align: center;
+            font-size: 18px;
+            color: var(--text-muted);
+            margin-bottom: 60px;
+            max-width: 600px;
+            margin-inline: auto;
+            line-height: 1.6;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            transition: transform 0.3s, border-color 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .icon-box {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            background: rgba(10, 132, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 24px;
+            color: var(--primary);
+            border: 1px solid rgba(10, 132, 255, 0.2);
+        }
+
+        .card h3 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .stats {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            padding: 60px 5%;
+            border-radius: 32px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 30px;
+            text-align: center;
+            margin-block: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-item h4 {
+            font-size: 56px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .stat-item p {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .pricing-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .price-tag {
+            font-size: 56px;
+            font-weight: 900;
+            margin: 24px 0;
+            color: var(--text);
+        }
+
+        .price-tag span {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .pkg-lst {
+            list-style: none;
+            margin-bottom: 40px;
+            flex-grow: 1;
+        }
+
+        .pkg-lst li {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 16px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pkg-lst li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .pkg-lst li:last-child {
+            border: none;
+        }
+
+        .pro-card {
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(10, 132, 255, 0.15);
+            transform: scale(1.03);
+        }
+
+        .pro-card .icon-box {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px 32px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .faq-item:hover {
+            background: rgba(30, 30, 35, 0.8);
+        }
+
+        .faq-q {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-a {
+            color: var(--text-muted);
+            margin-top: 16px;
+            line-height: 1.7;
+            font-size: 16px;
+            display: none;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 80px 5% 40px;
+            background: rgba(10, 10, 15, 0.5);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            max-width: 1300px;
+            margin: 0 auto;
+            margin-bottom: 60px;
+        }
+
+        .footer-col h4 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: white;
+        }
+
+        .footer-col p {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 24px;
+            max-width: 300px;
+        }
+
+        .footer-col a {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 16px;
+            transition: color 0.3s;
+            font-size: 15px;
+        }
+
+        .footer-col a:hover {
+            color: var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+            padding-top: 32px;
+            display: flex;
+            justify-content: space-between;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 900px) {
+            h1 { font-size: 48px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .nav-links { display: none; }
+            .pro-card { transform: scale(1); }
+            .copyright { flex-direction: column; gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <nav>
+        <a onclick="location.href='/'" class="brand">
+            <img src="https://f.top4top.io/p_37210bgwm1.jpg" alt="Logo">
+            استضافة الذئب
+        </a>
+        <div class="nav-links">
+            <a href="#features">التقنيات</a>
+            <a href="#pricing">الباقات</a>
+            <a onclick="location.href='/features-info'">المميزات الشاملة</a>
+            <a onclick="location.href='/docs'">مركز المساعدة</a>
+            <a onclick="location.href='/developer'">عن المطور</a>
+        </div>
+        <div>
+            <a onclick="location.href='/login'" class="btn">ابدأ الآن — مجاناً</a>
+        </div>
+    </nav>
+
+    <header>
+        <h1>المحرك الأقوى لتشغيل <br>بوتات التلجرام.</h1>
+        <p>صُممت استضافة الذئب خصيصاً للمطورين المحترفين لتشغيل بوتات بايثون بأعلى درجات الاستقرار والسرعة والعزل الأمني الكامل. قم بإدارة سيرفرك بضغطة زر وبدون سطر أوامر واحد.</p>
+        <div class="header-btns">
+            <a onclick="location.href='/login'" class="btn" style="padding: 16px 40px; font-size: 18px; border-radius: 20px;">إنشاء حساب جديد</a>
+            <a onclick="location.href='/docs'" class="btn btn-secondary" style="padding: 16px 40px; font-size: 18px; border-radius: 20px;">تصفح الدليل</a>
+        </div>
+    </header>
+
+    <section id="features">
+        <div class="sec-title">تقنيات استثنائية لمشروعك</div>
+        <div class="sec-desc">بُنيت بنيتنا التحتية لتوفير كل ما تحتاجه لإبقاء مشاريعك البرمجية تعمل بكفاءة على مدار 24 ساعة دون تدخل منك.</div>
+
+        <div class="grid-3">
+            <div class="card">
+                <div class="icon-box">⚡</div>
+                <h3>أوتو ريكفري (Auto-Recovery)</h3>
+                <p>مراقب ذكي يقوم بفحص البوت تلقائياً، وإذا توقف أو واجه خطأ يتم إعادة تشغيله خلال ثوانٍ معدودة بدون تدخل يدوي.</p>
+            </div>
+            <div class="card">
+                <div class="icon-box">🛡️</div>
+                <h3>حاويات معزولة بالكامل</h3>
+                <p>يتم حجز موارد الـ CPU والـ RAM لكل مستخدم في حاويات معزولة تمنع تداخل الملفات وتحمي الشفرة المصدرية من أي وصول غير مصرح.</p>
+            </div>
+            <div class="card">
+                <div class="icon-box">📦</div>
+                <h3>إدارة تلقائية للمكتبات</h3>
+                <p>لا تشغل بالك بتثبيت المكتبات، النظام يكتشف نقص PIP ويقوم بتثبيت الحزم المفقودة بمجرد بدء السيرفر لتسريع عملية التنفيذ.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="stats">
+            <div class="stat-item">
+                <h4>100%</h4>
+                <p>وقت تشغيل مستقر</p>
+            </div>
+            <div class="stat-item">
+                <h4>600ms</h4>
+                <p>سرعة الاتصال بالتلجرام</p>
+            </div>
+            <div class="stat-item">
+                <h4>+Secure</h4>
+                <p>تشفير متقدم للبيانات</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing">
+        <div class="sec-title">خطة شاملة ومجانية للجميع</div>
+        <div class="sec-desc">نحن نؤمن بدعم المطورين، لذلك جعلنا المنصة مجانية بالكامل مع موارد ضخمة لكل مستخدم.</div>
+
+        <div class="grid-3" style="max-width: 800px; margin: 0 auto;">
+            <div class="card pricing-card pro-card" style="grid-column: span 3;">
+                <div class="icon-box">🛸</div>
+                <h3>باقة الذئب اللانهائية (Unlimited Free)</h3>
+                <p>كل ما تحتاجه لتشغيل أضخم المشاريع مجاناً.</p>
+                <div class="price-tag">$0 <span>/ دائماً</span></div>
+                <ul class="pkg-lst">
+                    <li>100 سيرفر بوت مستقل</li>
+                    <li>4GB ذاكرة وصول (RAM) لكل سيرفر</li>
+                    <li>10GB سعة تخزين (NVMe)</li>
+                    <li>دخول كامل لمساعد الذكاء الاصطناعي (AI Assistant)</li>
+                    <li>إدارة تلقائية للمكتبات (Auto-PIP)</li>
+                </ul>
+                <a onclick="location.href='/login'" class="btn" style="width: 100%">ابدأ الآن مجاناً</a>
+            </div>
+        </div>
+    </section>
+
+    <section style="max-width: 900px;">
+        <div class="sec-title">الأسئلة الشائعة</div>
+        <br>
+        <div class="faq-item" onclick="this.querySelector('.faq-a').style.display = this.querySelector('.faq-a').style.display === 'block' ? 'none' : 'block'">
+            <div class="faq-q">هل يمكنني تشغيل بوتات مكتوبة بلغات أخرى؟ <span>+</span></div>
+            <div class="faq-a">في الوقت الحالي استضافة الذئب مخصصة بشكل كامل ومحسنة لبيئة تشغيل Python بجميع مكتباتها مثل Telethon و Pyrogram المحسنة للإصدار 3.11.</div>
+        </div>
+        <div class="faq-item" onclick="this.querySelector('.faq-a').style.display = this.querySelector('.faq-a').style.display === 'block' ? 'none' : 'block'">
+            <div class="faq-q">كيف يتم رفع ملفات البوت للمنصة؟ <span>+</span></div>
+            <div class="faq-a">نقدم لك مدير ملفات متكامل (File Explorer) احترافي، يمكنك سحب وإفلات المجلدات بضغطة زر وسيقوم الخادم برفعها وتجهيزها مباشرة.</div>
+        </div>
+        <div class="faq-item" onclick="this.querySelector('.faq-a').style.display = this.querySelector('.faq-a').style.display === 'block' ? 'none' : 'block'">
+            <div class="faq-q">هل بيانات بوتاتي آمنة من السرقة؟ <span>+</span></div>
+            <div class="faq-a">بكل تأكيد. جميع الملفات مخفية ولا يمكن الوصول إليها إلا عبر حسابك المحمي بالتشفير. لا يحق لأي أطراف ثالثة فحص مجلداتك الخاصة.</div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <a onclick="location.href='/'" class="brand" style="margin-bottom: 24px;">
+                    <img src="https://f.top4top.io/p_37210bgwm1.jpg" alt="Logo">
+                    استضافة الذئب
+                </a>
+                <p>نحن المنصة الرائدة عربياً في تقديم حلول استضافة سحابية مخصصة لبوتات بايثون بأعلى معايير الأمان لتلبية احتياجات المطورين.</p>
+            </div>
+            <div class="footer-col">
+                <h4>الروابط السريعة</h4>
+                <a onclick="location.href='/login'">تسجيل الدخول / إنشاء حساب</a>
+                <a onclick="location.href='/features-info'">استكشاف الميزات</a>
+                <a href="#pricing">باقات الاشتراك</a>
+            </div>
+            <div class="footer-col">
+                <h4>الموارد</h4>
+                <a onclick="location.href='/docs'">الدليل الشامل</a>
+                <a onclick="location.href='/developer'">المطور</a>
+                <a href="https://t.me/j49_c" target="_blank">خدمة العملاء</a>
+            </div>
+            <div class="footer-col">
+                <h4>الشؤون القانونية</h4>
+                <a onclick="location.href='/terms'">شروط وأحكام الاستخدام</a>
+                <a onclick="location.href='/privacy'">سياسة الخصوصية والأمان</a>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <span>© 2026 White Wolf - جميع الحقوق محفوظة</span>
+            <span>White Wolf t.me/j49_c | channel t.me/bshshshkk</span>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(String.fromCharCode(e.keyCode))) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) return false;
+        };
+        setInterval(() => { const s = performance.now(); debugger; if (performance.now() - s > 100) window.location.href = "about:blank"; }, 500);
+    </script>
+</body>
+</html>

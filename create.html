@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>White Wolf · Create Account</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    :root {
+      --bg: #000000;
+      --surface: rgba(28, 28, 30, 0.6);
+      --surface-border: rgba(255, 255, 255, 0.1);
+      --primary: #0A84FF;
+      --primary-hover: #0071E3;
+      --text: #F5F5F7;
+      --muted: #86868B;
+      --error: #FF453A;
+    }
+
+    * { box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      color: var(--text); background-color: var(--bg);
+      background-image:
+        radial-gradient(circle at 85% 50%, rgba(10, 132, 255, 0.15), transparent 25%),
+        radial-gradient(circle at 15% 30%, rgba(255, 255, 255, 0.05), transparent 25%);
+      overflow: hidden; padding: 20px;
+    }
+
+    body::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 1px; background: linear-gradient(90deg, transparent, rgba(10, 132, 255, 0.5), transparent);
+    }
+
+    .container {
+      position: relative; z-index: 10; width: 100%; max-width: 440px;
+      animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0; transform: translateY(20px);
+    }
+
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--surface-border);
+      border-radius: 24px; backdrop-filter: blur(40px);
+      padding: 40px 32px; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .header { text-align: center; margin-bottom: 32px; }
+    .logo { font-size: 36px; margin-bottom: 12px; display: inline-block; background: linear-gradient(135deg, #fff, #a1a1a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
+    .sub { color: var(--muted); font-size: 13px; font-weight: 400; line-height: 1.5; }
+
+    .input-group { position: relative; margin-bottom: 12px; }
+
+    input {
+      width: 100%; padding: 14px 16px; border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(0, 0, 0, 0.3);
+      color: var(--text); font-size: 15px; outline: none; transition: all 0.2s ease;
+    }
+    input::placeholder { color: #6e6e73; }
+    input:focus { border-color: var(--primary); background: rgba(0, 0, 0, 0.5); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15); }
+
+    .actions { display: flex; gap: 12px; margin-top: 24px; flex-direction: column; }
+
+    .btn {
+      width: 100%; padding: 14px; border-radius: 12px; font-size: 15px;
+      font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; outline: none; text-align: center;
+    }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 14px rgba(10, 132, 255, 0.3); }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-secondary { background: transparent; color: var(--primary); border: 1px solid transparent; }
+    .btn-secondary:hover { background: rgba(10, 132, 255, 0.1); }
+
+    .msg { margin-top: 16px; color: var(--muted); font-size: 13px; text-align: center; min-height: 20px; }
+    .footer { text-align: center; margin-top: 24px; font-size: 12px; color: #424245; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="logo">White Wolf</div>
+        <div class="title">Create Account</div>
+        <div class="sub">Register your credentials to access the platform.</div>
+      </div>
+
+      <div class="input-group">
+        <input id="u" placeholder="Username (e.g., neo_01)">
+      </div>
+      <div class="input-group">
+        <input id="e" placeholder="Email Address">
+      </div>
+      <div class="input-group">
+        <input id="p" placeholder="Password (min 6 chars)" type="password">
+      </div>
+      <div class="input-group">
+        <input id="p2" placeholder="Confirm Password" type="password">
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" onclick="doCreate()">Submit Request</button>
+        <button class="btn btn-secondary" onclick="location.href='/login'">Return to Login</button>
+      </div>
+
+      <div class="msg" id="m"></div>
+    </div>
+    <div class="footer">White Wolf t.me/j49_c | channel t.me/bshshshkk</div>
+  </div>
+
+  <script>
+    async function doCreate() {
+      const m = document.getElementById('m');
+      m.style.color = "var(--muted)";
+      m.textContent = 'Processing clearance request...';
+      const username = document.getElementById('u').value.trim();
+      const email = document.getElementById('e').value.trim();
+      const password = document.getElementById('p').value;
+      const password2 = document.getElementById('p2').value;
+
+      const r = await fetch('/api/auth/create', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password, password2 })
+      });
+      const d = await r.json().catch(() => ({ success: false, message: 'Server transmission error' }));
+      if (!r.ok || !d.success) { m.style.color = "var(--error)"; m.textContent = d.message || 'Clearance denied'; return; }
+
+      m.style.color = "#32D74B";
+      m.textContent = 'Clearance granted. Redirecting...';
+      setTimeout(() => location.href = '/login', 1200);
+    }
+  </script>
+</body>
+</html>

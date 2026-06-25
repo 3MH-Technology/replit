@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>White Wolf · Dashboard</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #000000;
+      --card: rgba(15, 15, 20, 0.7);
+      --border: rgba(255, 255, 255, 0.08);
+      --primary: #0A84FF;
+      --primary-glow: rgba(10, 132, 255, 0.2);
+      --accent: #5E5CE6;
+      --text: #F5F5F7;
+      --text-dim: #8E8E93;
+      --success: #32D74B;
+      --warning: #FF9F0A;
+      --error: #FF453A;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 10% 10%, var(--primary-glow), transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(94, 92, 230, 0.1), transparent 40%);
+      background-attachment: fixed;
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-content {
+      max-width: 1400px; margin: 0 auto;
+      padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .brand { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+    .brand-logo { width: 40px; height: 40px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border); }
+    .brand-info { display: flex; flex-direction: column; }
+    .brand-name { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+    .brand-status { font-size: 11px; font-family: var(--mono); color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+    .btn {
+      padding: 10px 18px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid var(--border); background: var(--card); color: var(--text);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+
+    .btn:hover { background: rgba(255, 255, 255, 0.05); transform: translateY(-1px); border-color: rgba(255, 255, 255, 0.2); }
+    .btn-primary { background: var(--primary); border: none; color: white; }
+    .btn-primary:hover { background: #0071E3; box-shadow: 0 4px 15px rgba(10, 132, 255, 0.4); }
+    .btn-danger { color: var(--error); background: rgba(255, 69, 58, 0.1); border: 1px solid rgba(255, 69, 58, 0.2); }
+    .btn-danger:hover { background: var(--error); color: white; }
+
+    @media (max-width: 768px) {
+      .topbar-content { padding: 12px 16px; flex-direction: column; gap: 12px; }
+      .nav-actions { width: 100%; overflow-x: auto; padding-bottom: 4px; justify-content: flex-start; }
+      .btn { flex-shrink: 0; padding: 8px 12px; font-size: 11px; }
+      .brand-logo { width: 32px; height: 32px; }
+      .brand-name { font-size: 14px; }
+      .container { margin: 16px auto; padding: 0 16px; }
+    }
+
+    .ai-chat-container {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); display: flex; flex-direction: column;
+      height: 600px; overflow: hidden;
+    }
+
+    .ai-chat-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .ai-chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+    .ai-message { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5; }
+    .ai-message.user { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+    .ai-message.bot { align-self: flex-start; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+
+    .ai-chat-input-area { padding: 16px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+    .ai-chat-input { flex: 1; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; color: white; outline: none; }
+    .ai-chat-input:focus { border-color: var(--primary); }
+
+    .container { max-width: 1400px; margin: 32px auto; padding: 0 24px; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; animation: fadeIn 0.5s ease; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 24px; cursor: pointer;
+      transition: all 0.3s; display: flex; flex-direction: column;
+      justify-content: space-between; min-height: 160px; position: relative; overflow: hidden;
+    }
+
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+      background: var(--primary); opacity: 0; transition: opacity 0.3s;
+    }
+
+    .card:hover { transform: translateY(-4px); border-color: var(--primary); background: rgba(25, 25, 30, 0.8); }
+    .card:hover::before { opacity: 1; }
+
+    .srv-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.02em; }
+    .srv-meta { font-size: 13px; color: var(--text-dim); font-weight: 500; }
+
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 99px; background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border); font-size: 10px; font-weight: 800;
+      font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 20px;
+    }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-dim); }
+    .status-pill.running { border-color: var(--success); color: var(--success); }
+    .status-pill.running .dot { background: var(--success); box-shadow: 0 0 8px var(--success); }
+    .status-pill.installing { border-color: var(--warning); color: var(--warning); }
+    .status-pill.installing .dot { background: var(--warning); animation: blink 1s infinite; }
+    .status-pill.error { border-color: var(--error); color: var(--error); }
+    .status-pill.error .dot { background: var(--error); }
+
+    @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+    #serverView { display: none; }
+
+    .view-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
+    .view-title h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.04em; }
+
+    .tab-group { display: flex; background: var(--card); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+    .tab { padding: 8px 18px; border-radius: calc(var(--radius-sm) - 4px); font-size: 13px; font-weight: 700; color: var(--text-dim); cursor: pointer; transition: all 0.2s; }
+    .tab:hover { color: var(--text); }
+    .tab.active { background: rgba(255, 255, 255, 0.1); color: var(--text); }
+
+    .manager-layout { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+    @media (max-width: 1000px) { .manager-layout { grid-template-columns: 1fr; } }
+
+    .console-box {
+      background: #000; border: 1px solid var(--border);
+      border-radius: var(--radius-md); display: flex; flex-direction: column;
+      overflow: hidden; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .console-nav { background: #111; padding: 10px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-family: var(--mono); color: var(--text-dim); }
+
+    .dots { display: flex; gap: 6px; }
+    .dots span { width: 10px; height: 10px; border-radius: 50%; }
+    .red { background: #ff5f56; }
+    .yellow { background: #ffbd2e; }
+    .green { background: #27c93f; }
+
+    .console-out {
+      padding: 20px; height: 560px; overflow-y: auto; font-family: var(--mono);
+      font-size: 13px; line-height: 1.6; color: #e0e0e0; white-space: pre-wrap; position: relative;
+    }
+
+    .console-out::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+      background-size: 100% 4px, 3px 100%; pointer-events: none; z-index: 10; opacity: 0.3;
+    }
+
+    .side-panel { display: flex; flex-direction: column; gap: 16px; }
+    .side-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; }
+
+    .stat-row { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+    .stat-row:last-child { margin-bottom: 0; }
+
+    .ico-box { width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; color: var(--primary); }
+    .stat-val { display: flex; flex-direction: column; }
+    .stat-label { font-size: 10px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-num { font-size: 14px; font-weight: 600; font-family: var(--mono); }
+
+    .file-manager { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+    .fm-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .fm-path { font-family: var(--mono); font-size: 13px; color: var(--text-dim); }
+    .fm-path a { color: var(--primary); text-decoration: none; border-bottom: 1px dotted transparent; }
+    .fm-path a:hover { border-bottom-color: var(--primary); }
+    .fm-table { width: 100%; border-collapse: collapse; }
+    .fm-table th, .fm-table td { text-align: left; padding: 14px 24px; border-bottom: 1px solid var(--border); }
+    .fm-table th { font-size: 11px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; background: rgba(0, 0, 0, 0.2); }
+    .fm-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+    .fm-name { cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
+    .fm-name:hover { color: var(--primary); }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px); z-index: 1000; display: none;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-box { background: #111; border: 1px solid var(--border); border-radius: var(--radius-lg); width: 100%; max-width: 440px; padding: 32px; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5); }
+    .modal-box h3 { font-size: 20px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.02em; }
+    .modal-box input { width: 100%; background: #000; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; color: white; margin-bottom: 24px; outline: none; }
+    .modal-box input:focus { border-color: var(--primary); }
+
+    #editor-view { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: none; flex-direction: column; }
+    .editor-top { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #0a0a0a; }
+    .editor-area { flex: 1; background: #000; color: #d4d4d4; font-family: var(--mono); font-size: 14px; padding: 30px; border: none; outline: none; resize: none; line-height: 1.6; }
+
+    .toast-container { position: fixed; top: 80px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { background: rgba(20, 20, 25, 0.95); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 20px; font-size: 13px; font-weight: 600; color: var(--text); animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s; max-width: 360px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+    .toast.success { border-left: 3px solid var(--success); }
+    .toast.error { border-left: 3px solid var(--error); }
+    .toast.info { border-left: 3px solid var(--primary); }
+
+    @keyframes toastIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+  </style>
+</head>
+<body>
+  <div class="toast-container" id="toastBox"></div>
+  <div class="topbar">
+    <div class="topbar-content">
+      <div class="brand" onclick="goHome()">
+        <img src="https://f.top4top.io/p_37210bgwm1.jpg" alt="Logo" class="brand-logo">
+        <div class="brand-info">
+          <span class="brand-name">White Wolf</span>
+          <span class="brand-status">v0.1 · SECURE</span>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <button class="btn" onclick="showHelp()">HELP / مساعدة</button>
+        <button id="adminBtn" class="btn" style="display:none" onclick="location.href='/admin'">ADMIN / الإدارة</button>
+        <button id="homeBtn" class="btn" style="display:none" onclick="goHome()">DASHBOARD / لوحة التحكم</button>
+        <button id="newBtn" class="btn btn-primary">+ NEW ENGINE / سيرفر جديد</button>
+        <button id="delBtn" class="btn btn-danger" style="display:none" onclick="deleteServer()">DELETE / حذف</button>
+        <button class="btn btn-danger" onclick="location.href='/logout'">LOGOUT / خروج</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" id="homeView">
+    <div class="billing-panel" id="billingPanel"
+      style="display:none; padding: 24px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <h3 style="margin-bottom: 8px;">Welcome <span id="pName" style="color:var(--text)"></span></h3>
+        <p style="color:var(--text-muted); font-size:14px; font-family: var(--mono);">
+          PLAN: <strong id="pPlan"></strong> |
+          LIMIT: <span id="pBots"></span> BOTS / <span id="pMem"></span> RAM<br>
+          <span id="aiUsageTxt" style="font-size:11px; color:var(--primary)">AI REQUESTS TODAY: --</span>
+        </p>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-primary" onclick="switchView('ai')">AI ASSISTANT / مساعد ذكي</button>
+      </div>
+    </div>
+    <div id="adPanel"
+      style="display:none; margin-bottom: 24px; padding: 20px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px dashed var(--border); text-align: center;">
+    </div>
+    <div class="grid" id="cardsContainer"></div>
+  </div>
+
+  <div class="container" id="aiView" style="display:none">
+    <div class="view-header">
+      <div class="view-title">
+        <h1>WHITE WOLF AI</h1>
+        <div style="color:var(--text-dim); font-size:13px; margin-top:4px;">POWERED BY OLLAMA FREE API</div>
+      </div>
+      <button class="btn" onclick="goHome()">BACK / رجوع</button>
+    </div>
+
+    <div class="ai-chat-container">
+      <div class="ai-chat-header">
+        <span style="font-weight: 700;">AI CHAT</span>
+        <select id="aiModelSelect" class="btn" style="padding: 4px 8px; font-size: 11px;">
+          <option value="deepseek-r1:latest">DeepSeek R1 (Strong)</option>
+          <option value="llama3.2:3b">Llama 3.2 3B (Fast)</option>
+          <option value="mistral:latest">Mistral</option>
+          <option value="gpt-oss:20b">Gemma 20B</option>
+        </select>
+      </div>
+      <div class="ai-chat-messages" id="aiMessages">
+        <div class="ai-message bot">Hello! I am the White Wolf AI assistant. How can I help you today?</div>
+      </div>
+      <div class="ai-chat-input-area">
+        <input type="text" id="aiInput" class="ai-chat-input" placeholder="Type your message / اكتب رسالتك هنا..." onkeypress="if(event.key==='Enter') sendAiMessage()">
+        <button class="btn btn-primary" onclick="sendAiMessage()">SEND</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" id="serverView">
+    <div class="view-header">
+      <div class="view-title">
+        <h1 id="srvHeader">SERVER</h1>
+        <div style="color:var(--text-dim); font-size:13px; margin-top:4px;" id="srvSub">ACTIVE SESSION / جلسة نشطة</div>
+      </div>
+      <div class="tab-group">
+        <div class="tab active" id="tabConsole" onclick="switchTab('console')">CONSOLE / موجه الأوامر</div>
+        <div class="tab" id="tabFiles" onclick="switchTab('files')">FILE MANAGER / الملفات</div>
+      </div>
+    </div>
+
+    <div id="viewConsole">
+      <div class="manager-layout">
+        <div class="console-box">
+          <div class="console-nav">
+            <div class="dots"><span class="red"></span><span class="yellow"></span><span class="green"></span></div>
+            <span>STDOUT STREAM</span>
+            <span>UTF-8</span>
+          </div>
+          <div class="console-out" id="logOut">INITIALIZING VIRTUAL ENVIRONMENT...</div>
+        </div>
+
+        <div class="side-panel">
+          <button id="btnStart" class="btn btn-primary" style="width:100%; height:50px; font-size:14px;" onclick="srvAction('start')">START / تشغيل</button>
+          <button class="btn" style="width:100%; padding:14px;" onclick="srvAction('restart')">RESTART / إعادة تشغيل</button>
+          <button class="btn btn-danger" style="width:100%; padding:14px;" onclick="srvAction('stop')">STOP / إيقاف</button>
+
+          <div class="side-card">
+            <div class="stat-row">
+              <div class="ico-box">⚡</div>
+              <div class="stat-val"><span class="stat-label">STATUS</span><span class="stat-num" id="statusTxt">OFFLINE</span></div>
+            </div>
+            <div class="stat-row">
+              <div class="ico-box">💾</div>
+              <div class="stat-val"><span class="stat-label">MEMORY</span><span class="stat-num" id="memTxt">0.0 MB</span></div>
+            </div>
+            <div class="stat-row">
+              <div class="ico-box">⚙️</div>
+              <div class="stat-val"><span class="stat-label">CPU</span><span class="stat-num" id="cpuTxt">0%</span></div>
+            </div>
+            <div class="stat-row">
+              <div class="ico-box">🌐</div>
+              <div class="stat-val"><span class="stat-label">IP ADDRESS</span><span class="stat-num" id="ipTxt">0.0.0.0</span></div>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <div class="stat-label" style="margin-bottom:8px;">STARTUP FILE</div>
+            <div style="font-family:var(--mono); font-size:13px; color:var(--primary); cursor:pointer; text-decoration:underline" onclick="changeStartup()" id="mainFileTxt">NOT SET</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="viewFiles" style="display:none" class="file-manager">
+      <div class="fm-header">
+        <div class="fm-path" id="pathBar"></div>
+        <div class="nav-actions">
+          <button id="btnBack" class="btn" style="display:none" onclick="goUp()">BACK / رجوع</button>
+          <button class="btn" onclick="newFolder()">+ DIR / مجلد جديد</button>
+          <button class="btn btn-primary" onclick="document.getElementById('uplFiles').click()">UPLOAD / رفع ملف</button>
+          <button class="btn" onclick="document.getElementById('uplFolder').click()">BUNDLE / رفع مجلد</button>
+        </div>
+      </div>
+      <input type="file" id="uplFiles" multiple hidden onchange="doUploadFiles(this)">
+      <input type="file" id="uplFolder" webkitdirectory directory multiple hidden onchange="doUploadFolder(this)">
+      <table class="fm-table">
+        <thead>
+          <tr>
+            <th>ENTITY NAME / اسم الملف</th>
+            <th style="width:120px">SIZE / الحجم</th>
+            <th style="width:280px">ACTIONS / العمليات</th>
+          </tr>
+        </thead>
+        <tbody id="fileList"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="editor-view">
+    <div class="editor-top">
+      <div style="font-family:var(--mono); font-weight:600" id="ed-title">ENTITY</div>
+      <div class="nav-actions">
+        <button class="btn btn-primary" onclick="saveFile()">SAVE / حفظ</button>
+        <button class="btn" onclick="closeEditor()">CLOSE / إغلاق</button>
+      </div>
+    </div>
+    <textarea class="editor-area" id="ed-area" spellcheck="false"></textarea>
+  </div>
+
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal-box">
+      <h3 id="mTitle">ACTION</h3>
+      <input id="mIn" autocomplete="off" spellcheck="false">
+      <div class="nav-actions" style="justify-content:flex-end">
+        <button class="btn" onclick="closeM()">CANCEL / إلغاء</button>
+        <button id="mConfirm" class="btn btn-primary">CONFIRM / تأكيد</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentSrv = null, poll = null, currentFile = null, currentPath = '';
+
+    function escapeHtml(s) { return (s || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+    function escapeAttr(s) { return escapeHtml(s).replace(/\\/g, "\\\\"); }
+
+    async function loadServers() {
+      const r = await fetch('/servers');
+      if (r.redirected) { location.href = r.url; return; }
+      const d = await r.json();
+      const cont = document.getElementById('cardsContainer');
+      cont.innerHTML = '';
+
+      fetch('/admin').then(res => { if (!res.redirected && res.status === 200) document.getElementById('adminBtn').style.display = 'inline-flex'; });
+
+      fetch('/api/user/profile').then(res => res.json()).then(data => {
+        if (data.success) {
+          document.getElementById('billingPanel').style.display = 'flex';
+          document.getElementById('pName').textContent = data.username.toUpperCase();
+          document.getElementById('pPlan').textContent = data.plan_label.toUpperCase();
+          document.getElementById('pBots').textContent = data.max_bots;
+          document.getElementById('pMem').textContent = data.max_mem_mb + 'MB';
+          if (data.ai_usage) {
+            const usage = data.ai_usage;
+            document.getElementById('aiUsageTxt').textContent = `AI REQUESTS TODAY: ${usage.count || 0} / 20`;
+          }
+        }
+      });
+
+      loadAds();
+
+      (d.servers || []).forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        const st = (s.status || 'Offline').toLowerCase();
+        let sub = s.subtitle || 'NO PROTOCOL';
+        let expHtml = '';
+
+        if (s.last_renewed) {
+          const days = (Date.now() / 1000 - s.last_renewed) / (24 * 3600);
+          if (days > 4) {
+            sub = `<span style="color:var(--error)">EXPIRED / انتهت الصلاحية</span>`;
+            expHtml = `<button class="btn btn-primary" style="margin-top:10px; width:100%" onclick="event.stopPropagation(); renewBot('${s.key}')">RENEW / تجديد</button>`;
+          } else {
+            const rem = (4 - days).toFixed(1);
+            sub += ` <br><span style="font-size:10px; color:var(--text-dim)">RENEW IN: ${rem} DAYS</span>`;
+          }
+        }
+
+        const cls = st === 'running' ? 'running' : (st === 'installing' || st === 'starting' ? 'installing' : (s.banned ? 'error' : ''));
+
+        div.innerHTML = `
+          <div style="flex-grow:1">
+            <div class="srv-name">${escapeHtml(s.title)}</div>
+            <div class="srv-meta">${sub}</div>
+            ${expHtml}
+          </div>
+          <div class="status-pill ${cls}"><span class="dot"></span>${st.toUpperCase()}</div>
+        `;
+        div.onclick = () => openServer(s);
+        cont.appendChild(div);
+      });
+    }
+
+    async function loadAds() {
+      const res = await fetch('/api/ads');
+      const data = await res.json();
+      const adBox = document.getElementById('adPanel');
+      if (data.current_ad) {
+        adBox.style.display = 'block';
+        adBox.innerHTML = data.current_ad;
+      } else {
+        adBox.style.display = 'block';
+        adBox.innerHTML = `<div style="color:var(--text-dim); font-size:14px">Your ad here? / أعلن هنا؟ <a href="${data.contact_link}" target="_blank" style="color:var(--primary); text-decoration:none">CONTACT US</a></div>`;
+      }
+    }
+
+    async function renewBot(key) {
+      const r = await fetch(`/api/server/renew/${encodeURIComponent(key)}`, { method: 'POST' });
+      const d = await r.json();
+      if (d.success) { toast('Bot Renewed!', 'success'); loadServers(); }
+    }
+
+    function showHelp() {
+      const helpText = `
+        <div id="helpTxtInner" style="text-align:right; direction:rtl; line-height:1.6; margin-bottom:20px; font-size:14px; max-height: 300px; overflow-y: auto;">
+          <h2 style="color:var(--primary); margin-bottom:10px">Platform Guide / دليل استخدام المنصة</h2>
+          <p>1. <b>Create:</b> Press "New Engine" and give your project a name.</p>
+          <p>2. <b>Files:</b> Inside server panel, upload your files (Python or PHP).</p>
+          <p>3. <b>Run:</b> Click on the startup file name and set it as Entrypoint.</p>
+          <p>4. <b>Resources:</b> Resources are limited, so write efficient code.</p>
+          <p>5. <b>Renewal:</b> Reactivate your bot every 4 days or it will stop.</p>
+          <p>6. <b>PHP:</b> Full PHP support is now available.</p>
+          <p>7. <b>AI:</b> You have 20 daily AI assistant requests.</p>
+        </div>
+      `;
+      openM("Platform Guide / دليل المنصة", "", () => closeM());
+      document.getElementById('mIn').style.display = 'none';
+      document.getElementById('mTitle').insertAdjacentHTML('afterend', helpText);
+    }
+
+    function openServer(s) {
+      currentSrv = s;
+      switchView('server');
+      document.getElementById('homeBtn').style.display = 'inline-flex';
+      document.getElementById('newBtn').style.display = 'none';
+      document.getElementById('delBtn').style.display = 'inline-flex';
+      document.getElementById('srvHeader').textContent = s.title.toUpperCase();
+      document.getElementById('mainFileTxt').textContent = s.startup_file || "NOT SET";
+      switchTab('console');
+    }
+
+    function goHome() {
+      switchView('home');
+      document.getElementById('homeBtn').style.display = 'none';
+      document.getElementById('delBtn').style.display = 'none';
+      document.getElementById('newBtn').style.display = 'inline-flex';
+      clearInterval(poll);
+    }
+
+    function switchView(v) {
+      document.getElementById('homeView').style.display = v === 'home' ? 'block' : 'none';
+      document.getElementById('serverView').style.display = v === 'server' ? 'block' : 'none';
+      document.getElementById('aiView').style.display = v === 'ai' ? 'block' : 'none';
+      if (v === 'home') loadServers();
+      if (v === 'ai') {
+        document.getElementById('homeBtn').style.display = 'inline-flex';
+        document.getElementById('newBtn').style.display = 'none';
+      }
+    }
+
+    async function sendAiMessage() {
+      const input = document.getElementById('aiInput');
+      const msg = input.value.trim();
+      if (!msg) return;
+      const model = document.getElementById('aiModelSelect').value;
+      const msgsCont = document.getElementById('aiMessages');
+
+      const uDiv = document.createElement('div');
+      uDiv.className = 'ai-message user';
+      uDiv.textContent = msg;
+      msgsCont.appendChild(uDiv);
+      input.value = '';
+      msgsCont.scrollTop = msgsCont.scrollHeight;
+
+      const bDiv = document.createElement('div');
+      bDiv.className = 'ai-message bot';
+      bDiv.textContent = 'Thinking... / جاري التفكير...';
+      msgsCont.appendChild(bDiv);
+      msgsCont.scrollTop = msgsCont.scrollHeight;
+
+      try {
+        const r = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: msg, model })
+        });
+        const d = await r.json();
+        bDiv.textContent = d.success ? d.response : (d.message || 'Error');
+        if (!d.success) bDiv.style.color = 'var(--error)';
+      } catch (e) {
+        bDiv.textContent = 'Connection error.';
+        bDiv.style.color = 'var(--error)';
+      }
+      msgsCont.scrollTop = msgsCont.scrollHeight;
+    }
+
+    function switchTab(t) {
+      document.getElementById('tabConsole').classList.toggle('active', t === 'console');
+      document.getElementById('tabFiles').classList.toggle('active', t === 'files');
+      document.getElementById('viewConsole').style.display = t === 'console' ? 'block' : 'none';
+      document.getElementById('viewFiles').style.display = t === 'files' ? 'block' : 'none';
+      if (t === 'console') startPolling(); else { clearInterval(poll); loadFiles(); }
+    }
+
+    async function startPolling() {
+      if (poll) clearInterval(poll);
+      const fn = async () => {
+        try {
+          const r = await fetch(`/server/stats/${encodeURIComponent(currentSrv.key || currentSrv.folder)}`);
+          const d = await r.json();
+          document.getElementById('logOut').textContent = d.logs || "ESTABLISHING VIRTUAL LINK...";
+          document.getElementById('statusTxt').textContent = (d.status || 'OFFLINE').toUpperCase();
+          document.getElementById('memTxt').textContent = d.mem || '0.0 MB';
+          document.getElementById('cpuTxt').textContent = d.cpu || '0%';
+          document.getElementById('ipTxt').textContent = d.ip || '0.0.0.0';
+          const running = ['running', 'installing', 'starting'].includes(d.status.toLowerCase());
+          document.getElementById('btnStart').disabled = running;
+          document.getElementById('btnStart').style.opacity = running ? 0.5 : 1;
+          const lo = document.getElementById('logOut'); lo.scrollTop = lo.scrollHeight;
+        } catch (e) { }
+      };
+      fn(); poll = setInterval(fn, 2000);
+    }
+
+    async function srvAction(act) { await fetch(`/server/action/${encodeURIComponent(currentSrv.key || currentSrv.folder)}/${act}`, { method: 'POST' }); }
+
+    async function loadFiles() {
+      const r = await fetch(`/files/list/${encodeURIComponent(currentSrv.key || currentSrv.folder)}?path=${encodeURIComponent(currentPath)}`);
+      const data = await r.json();
+      document.getElementById("btnBack").style.display = currentPath ? "inline-flex" : "none";
+
+      let crumbs = [`<span class="crumb"><a href="#" onclick="jumpPath('')">ROOT</a></span>`];
+      let acc = '';
+      (data.path || '').split('/').filter(Boolean).forEach(p => {
+        acc = acc ? (acc + '/' + p) : p;
+        crumbs.push('<span style="opacity:0.3"> / </span>' + `<span class="crumb"><a href="#" onclick="jumpPath('${escapeAttr(acc)}')">${escapeHtml(p)}</a></span>`);
+      });
+      document.getElementById('pathBar').innerHTML = crumbs.join('');
+
+      let html = '';
+      (data.dirs || []).forEach(d => {
+        html += `<tr><td><div class="fm-name" onclick="openFolder('${escapeAttr(d.name)}')">📁 ${escapeHtml(d.name)}</div></td><td style="color:var(--text-dim)">DIR</td><td>
+          <div class="nav-actions"><button class="btn" style="padding:4px 8px" onclick="renameDir('${escapeAttr(d.name)}')">RENAME</button>
+          <button class="btn btn-danger" style="padding:4px 8px" onclick="deleteDir('${escapeAttr(d.name)}')">DEL</button></div></td></tr>`;
+      });
+      (data.files || []).forEach(f => {
+        const rel = currentPath ? `${currentPath}/${f.name}` : f.name;
+        html += `<tr><td><div class="fm-name" onclick="openEditor('${escapeAttr(rel)}')">📄 ${escapeHtml(f.name)}</div></td><td style="font-family:var(--mono);font-size:12px">${f.size}</td><td>
+          <div class="nav-actions"><button class="btn" style="padding:4px 8px" onclick="renameFilePrompt('${escapeAttr(f.name)}')">RENAME</button>
+          <button class="btn btn-danger" style="padding:4px 8px" onclick="deleteFilePrompt('${escapeAttr(f.name)}')">DEL</button></div></td></tr>`;
+      });
+      document.getElementById('fileList').innerHTML = html;
+    }
+
+    function openFolder(name) { currentPath = currentPath ? (currentPath + '/' + name) : name; loadFiles(); }
+    function jumpPath(p) { currentPath = p; loadFiles(); }
+    function goUp() { let p = currentPath.split('/'); p.pop(); currentPath = p.join('/'); loadFiles(); }
+
+    async function openEditor(name) {
+      currentFile = name; document.getElementById('ed-title').textContent = name.toUpperCase();
+      const res = await fetch(`/files/content/${encodeURIComponent(currentSrv.key || currentSrv.folder)}?file=${encodeURIComponent(name)}`);
+      const d = await res.json();
+      document.getElementById('ed-area').value = d.content || '';
+      document.getElementById('editor-view').style.display = 'flex';
+    }
+    function closeEditor() { document.getElementById('editor-view').style.display = 'none'; }
+    function toast(msg, type = 'info') {
+      const box = document.getElementById('toastBox');
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.textContent = msg;
+      box.appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    }
+
+    async function saveFile() {
+      try {
+        const r = await fetch(`/files/save/${encodeURIComponent(currentSrv.key || currentSrv.folder)}`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ file: currentFile, content: document.getElementById('ed-area').value })
+        });
+        const d = await r.json();
+        if (d.success) toast('FILE SAVED', 'success');
+        else toast(d.message || 'Save failed', 'error');
+      } catch (e) { toast('Network error', 'error'); }
+    }
+
+    function openM(t, v, cb) {
+      document.getElementById('modalOverlay').style.display = 'flex';
+      document.getElementById('mTitle').textContent = t.toUpperCase();
+      const mIn = document.getElementById('mIn');
+      mIn.value = v || '';
+      mIn.style.display = 'block';
+      const oldHelp = document.getElementById('helpTxtInner');
+      if (oldHelp) oldHelp.remove();
+      document.getElementById('mConfirm').onclick = () => cb(mIn.value);
+    }
+    function closeM() {
+      document.getElementById('modalOverlay').style.display = 'none';
+      const oldHelp = document.getElementById('helpTxtInner');
+      if (oldHelp) oldHelp.remove();
+    }
+
+    async function renameDir(n) { openM("Rename Directory", n, async v => { await fetch(`/files/rename/${encodeURIComponent(currentSrv.key || currentSrv.folder)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: currentPath, old: n, new: v }) }); loadFiles(); closeM(); toast('Renamed', 'success'); }); }
+    async function deleteDir(n) { if (confirm(`DELETE DIRECTORY '${n}'?`)) { await fetch(`/files/delete/${encodeURIComponent(currentSrv.key || currentSrv.folder)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: currentPath, name: n, kind: 'dir' }) }); loadFiles(); toast('Directory deleted', 'success'); } }
+    async function renameFilePrompt(n) { openM("Rename File", n, async v => { await fetch(`/files/rename/${encodeURIComponent(currentSrv.key || currentSrv.folder)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: currentPath, old: n, new: v }) }); loadFiles(); closeM(); toast('Renamed', 'success'); }); }
+    async function deleteFilePrompt(n) { if (confirm(`DELETE FILE '${n}'?`)) { await fetch(`/files/delete/${encodeURIComponent(currentSrv.key || currentSrv.folder)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: currentPath, name: n, kind: 'file' }) }); loadFiles(); toast('File deleted', 'success'); } }
+
+    async function doUploadFiles(inp) { let fd = new FormData(); for (let f of inp.files) fd.append("files", f); await fetch(`/files/upload/${encodeURIComponent(currentSrv.key || currentSrv.folder)}?path=${encodeURIComponent(currentPath)}`, { method: "POST", body: fd }); loadFiles(); toast(`${inp.files.length} file(s) uploaded`, 'success'); inp.value = ''; }
+    async function doUploadFolder(inp) { let fd = new FormData(); for (let f of inp.files) { fd.append("files", f); fd.append("relpaths", f.webkitRelativePath || f.name); } await fetch(`/files/upload/${encodeURIComponent(currentSrv.key || currentSrv.folder)}?path=${encodeURIComponent(currentPath)}`, { method: "POST", body: fd }); loadFiles(); toast('Folder uploaded', 'success'); inp.value = ''; }
+
+    async function changeStartup() { openM("Set Entrypoint", currentSrv.startup_file, async v => { await fetch(`/server/set-startup/${encodeURIComponent(currentSrv.key || currentSrv.folder)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ file: v }) }); currentSrv.startup_file = v; document.getElementById('mainFileTxt').textContent = v; closeM(); toast('Entrypoint updated', 'success'); }); }
+    async function deleteServer() { if (confirm("PERMANENT DATA DESTRUCTION?")) { await fetch(`/server/delete/${encodeURIComponent(currentSrv.key || currentSrv.folder)}`, { method: 'POST' }); goHome(); toast('Server deleted', 'success'); } }
+
+    document.getElementById('newBtn').onclick = () => openM("CREATE NEW ENGINE", "", async v => {
+      const r = await fetch('/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: v }) });
+      const d = await r.json();
+      if (d.success) { closeM(); loadServers(); toast('Engine created', 'success'); } else toast(d.message, 'error');
+    });
+
+    document.addEventListener('DOMContentLoaded', () => { loadServers(); });
+    setInterval(() => { if (document.getElementById('homeView').style.display !== 'none') loadServers(); }, 10000);
+
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.onkeydown = function (e) {
+      if (e.keyCode == 123) return false;
+      if (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0))) return false;
+      if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+    };
+    setInterval(() => {
+      const start = performance.now();
+      debugger;
+      if (performance.now() - start > 100) window.location.href = "about:blank";
+    }, 500);
+  </script>
+</body>
+</html>

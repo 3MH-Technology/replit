@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>White Wolf · Access Control</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg: #050505;
+      --card-bg: rgba(15, 15, 20, 0.7);
+      --primary: #0A84FF;
+      --primary-glow: rgba(10, 132, 255, 0.4);
+      --accent: #5E5CE6;
+      --text: #FFFFFF;
+      --text-muted: #8E8E93;
+      --border: rgba(255, 255, 255, 0.08);
+      --error: #FF453A;
+      --success: #32D74B;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg); color: var(--text); height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+    }
+
+    body::before {
+      content: ''; position: absolute; width: 50vw; height: 50vw;
+      background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+      top: -25vw; left: -25vw; z-index: 0; filter: blur(80px);
+      animation: float 20s infinite alternate ease-in-out;
+    }
+
+    body::after {
+      content: ''; position: absolute; width: 40vw; height: 40vw;
+      background: radial-gradient(circle, rgba(94, 92, 230, 0.15) 0%, transparent 70%);
+      bottom: -20vw; right: -20vw; z-index: 0; filter: blur(80px);
+      animation: float 25s infinite alternate-reverse ease-in-out;
+    }
+
+    @keyframes float {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(10%, 10%) scale(1.1); }
+    }
+
+    .container { width: 100%; max-width: 420px; padding: 20px; position: relative; z-index: 10; }
+
+    .login-card {
+      background: var(--card-bg); backdrop-filter: blur(30px);
+      border: 1px solid var(--border); border-radius: 28px;
+      padding: 48px 32px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      text-align: center; animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo-container { position: relative; margin-bottom: 32px; display: inline-block; }
+    .logo-img { width: 100px; height: 100px; border-radius: 30px; object-fit: cover; position: relative; z-index: 2; border: 1px solid rgba(255, 255, 255, 0.2); }
+
+    .logo-glow {
+      position: absolute; inset: -5px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 32px; z-index: 1; filter: blur(15px);
+      opacity: 0.6; animation: pulse 4s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; filter: blur(10px); }
+      50% { opacity: 0.8; filter: blur(18px); }
+    }
+
+    h1 {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 8px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #A1A1A6 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-muted); font-size: 14px; font-weight: 500; margin-bottom: 40px;
+      font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.1em;
+    }
+
+    .tabs { display: flex; gap: 4px; margin-bottom: 28px; background: rgba(255, 255, 255, 0.05); border-radius: 14px; padding: 4px; }
+    .tab { flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-muted); font-size: 14px; font-weight: 700; cursor: pointer; border-radius: 12px; transition: all 0.3s; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: 0.05em; }
+    .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(10, 132, 255, 0.3); }
+    .tab:hover:not(.active) { color: var(--text); }
+
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+    .input-group { margin-bottom: 14px; position: relative; }
+
+    input {
+      width: 100%; background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 16px 20px; color: var(--text); font-size: 15px; font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); outline: none;
+    }
+    input:focus { border-color: var(--primary); background: rgba(255, 255, 255, 0.08); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.1); }
+    input::placeholder { color: rgba(255, 255, 255, 0.3); }
+
+    .btn {
+      width: 100%; background: var(--primary); color: white; border: none;
+      border-radius: 16px; padding: 16px; font-size: 16px; font-weight: 700;
+      cursor: pointer; transition: all 0.3s; margin-top: 12px; position: relative; overflow: hidden;
+    }
+    .btn:hover { background: #0071E3; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(10, 132, 255, 0.3); }
+    .btn:active { transform: translateY(0); }
+    .btn-secondary { background: rgba(255, 255, 255, 0.08); margin-top: 8px; }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); box-shadow: none; }
+
+    .msg { margin-top: 20px; font-size: 13px; font-weight: 500; min-height: 20px; transition: color 0.3s; }
+
+    .footer { margin-top: 36px; color: rgba(255, 255, 255, 0.2); font-size: 11px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; }
+
+    .loading-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--primary), transparent); width: 100%; display: none; animation: loading 1.5s infinite; }
+
+    @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+    .plans-info { margin-top: 16px; text-align: left; }
+    .plan-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 12px; margin-bottom: 6px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); font-size: 13px; }
+    .plan-name { font-weight: 700; color: var(--text); }
+    .plan-detail { color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+    .plan-free { border-color: rgba(50, 215, 75, 0.3); }
+    .plan-pro { border-color: rgba(10, 132, 255, 0.3); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="login-card">
+      <div class="logo-container">
+        <div class="logo-glow"></div>
+        <img src="https://f.top4top.io/p_37210bgwm1.jpg" alt="Logo" class="logo-img">
+      </div>
+      <h1>White Wolf</h1>
+      <div class="subtitle">Bot Hosting Platform / منصة استضافة البوتات</div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('login')">LOGIN / دخول</button>
+        <button class="tab" onclick="switchTab('register')">REGISTER / حساب جديد</button>
+      </div>
+
+      <div class="form-section active" id="loginForm">
+        <div class="input-group">
+          <input id="lu" placeholder="Username / اسم المستخدم" autocomplete="username">
+        </div>
+        <div class="input-group">
+          <input id="lp" placeholder="Password / كلمة المرور" type="password" autocomplete="current-password">
+        </div>
+        <button class="btn" onclick="doLogin()">
+          <span id="loginBtnText">AUTHENTICATE / تسجيل الدخول</span>
+          <div class="loading-bar" id="loginLoad"></div>
+        </button>
+      </div>
+
+      <div class="form-section" id="registerForm">
+        <div id="regStep1">
+          <div class="input-group">
+            <input id="re" placeholder="Email Address / البريد الإلكتروني" type="email" autocomplete="email">
+          </div>
+          <div class="input-group">
+            <input id="ru" placeholder="Choose a username / اختر اسم مستخدم" autocomplete="off" minlength="3" maxlength="20">
+          </div>
+          <div class="input-group">
+            <input id="rp" placeholder="Create a password / كلمة مرور جديدة" type="password" autocomplete="new-password" minlength="6">
+          </div>
+          <div class="input-group">
+            <input id="rp2" placeholder="Confirm password / تأكيد كلمة المرور" type="password" autocomplete="new-password">
+          </div>
+          <button class="btn" onclick="doRegister()">
+            <span id="regBtnText">CREATE ACCOUNT / إنشاء حساب</span>
+            <div class="loading-bar" id="regLoad"></div>
+          </button>
+        </div>
+
+        <div id="regStep2" style="display:none; text-align:center;">
+          <p style="color:var(--text-muted); font-size:14px; margin-bottom: 20px;">Creating your account...<br>جاري إنشاء حسابك...</p>
+          <div class="input-group">
+            <input id="rotp" placeholder="Enter 6-digit Code / أدخل الكود" maxlength="6" style="text-align:center; font-size: 24px; letter-spacing: 10px;">
+          </div>
+          <button class="btn" onclick="doVerify()">
+            <span id="verifyBtnText">VERIFY / تأكيد</span>
+            <div class="loading-bar" id="verifyLoad"></div>
+          </button>
+        </div>
+        <div class="plans-info">
+          <div class="plan-row plan-free" style="border-color: var(--success); background: rgba(50, 215, 75, 0.1);">
+            <span class="plan-name">UNLIMITED FREE / مجاني بالكامل</span>
+            <span class="plan-detail">100 BOTS · 4GB RAM · AI ACCESS</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="msg" id="m"></div>
+
+      <div class="footer">
+        © 2026 WHITE WOLF PROTOCOL v0.1<br>
+        White Wolf t.me/j49_c | channel t.me/bshshshkk
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach((t, i) => { t.classList.toggle('active', (tab === 'login' ? i === 0 : i === 1)); });
+      document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+      document.getElementById('registerForm').classList.toggle('active', tab === 'register');
+      document.getElementById('m').textContent = '';
+    }
+
+    async function doLogin() {
+      const m = document.getElementById('m');
+      const lb = document.getElementById('loginLoad');
+      const bt = document.getElementById('loginBtnText');
+      m.textContent = ''; lb.style.display = 'block'; bt.textContent = 'CONNECTING...';
+
+      const username = document.getElementById('lu').value.trim();
+      const password = document.getElementById('lp').value;
+
+      try {
+        const r = await fetch('/api/auth/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const d = await r.json().catch(() => ({ success: false, message: 'Connection error' }));
+        if (!r.ok || !d.success) {
+          m.style.color = "var(--error)";
+          m.textContent = (d.message || 'Authentication Failed').toUpperCase();
+          lb.style.display = 'none'; bt.textContent = 'AUTHENTICATE / تسجيل الدخول';
+          return;
+        }
+        m.style.color = "var(--success)";
+        m.textContent = 'ACCESS GRANTED';
+        bt.textContent = 'INITIALIZING...';
+        setTimeout(() => { window.location.href = d.is_admin ? './admin' : './'; }, 600);
+      } catch (e) {
+        m.style.color = "var(--error)"; m.textContent = "CONNECTION ERROR";
+        lb.style.display = 'none'; bt.textContent = 'RETRY';
+      }
+    }
+
+    async function doRegister() {
+      const m = document.getElementById('m');
+      const lb = document.getElementById('regLoad');
+      const bt = document.getElementById('regBtnText');
+      m.textContent = ''; lb.style.display = 'block'; bt.textContent = 'WORKING...';
+
+      const email = document.getElementById('re').value.trim();
+      const username = document.getElementById('ru').value.trim();
+      const password = document.getElementById('rp').value;
+      const pass2 = document.getElementById('rp2').value;
+
+      if (!email.includes('@')) { m.style.color = "var(--error)"; m.textContent = 'INVALID EMAIL / بريد غير صالح'; lb.style.display = 'none'; bt.textContent = 'CREATE ACCOUNT / إنشاء حساب'; return; }
+      if (password !== pass2) { m.style.color = "var(--error)"; m.textContent = 'PASSWORDS MISMATCH / كلمات المرور غير متطابقة'; lb.style.display = 'none'; bt.textContent = 'CREATE ACCOUNT / إنشاء حساب'; return; }
+      if (password.length < 6) { m.style.color = "var(--error)"; m.textContent = 'PASSWORD MIN 6 CHARACTERS / كلمة المرور قصيرة جداً'; lb.style.display = 'none'; bt.textContent = 'CREATE ACCOUNT / إنشاء حساب'; return; }
+
+      try {
+        const r = await fetch('/api/auth/register-otp', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, username, password })
+        });
+        const d = await r.json().catch(() => ({ success: false, message: 'Connection error' }));
+        if (!r.ok || !d.success) {
+          m.style.color = "var(--error)";
+          m.textContent = (d.message || 'Registration Failed / فشل التسجيل').toUpperCase();
+          lb.style.display = 'none'; bt.textContent = 'CREATE ACCOUNT / إنشاء حساب';
+          return;
+        }
+
+        if (d.skip_otp) {
+          m.style.color = "#FF9F0A";
+          m.textContent = d.message || 'ACCOUNT CREATED / تم إنشاء الحساب';
+          lb.style.display = 'none';
+          document.getElementById('regStep1').style.display = 'none';
+          bt.style.display = 'none';
+          return;
+        }
+
+        m.style.color = "var(--success)";
+        m.textContent = 'OTP SENT TO EMAIL / تم إرسال كود التحقق';
+        document.getElementById('regStep1').style.display = 'none';
+        document.getElementById('regStep2').style.display = 'block';
+
+      } catch (e) {
+        m.style.color = "var(--error)";
+        m.textContent = 'NETWORK FAILURE / فشل في الاتصال';
+        lb.style.display = 'none'; bt.textContent = 'CREATE ACCOUNT / إنشاء حساب';
+      }
+    }
+
+    async function doVerify() {
+      const m = document.getElementById('m');
+      const lb = document.getElementById('verifyLoad');
+      const bt = document.getElementById('verifyBtnText');
+      m.textContent = ''; lb.style.display = 'block'; bt.textContent = 'VERIFYING...';
+
+      const email = document.getElementById('re').value.trim();
+      const code = document.getElementById('rotp').value.trim();
+
+      try {
+        const r = await fetch('/api/auth/register-verify', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, code })
+        });
+        const d = await r.json().catch(() => ({ success: false, message: 'Connection error' }));
+        if (!r.ok || !d.success) {
+          m.style.color = "var(--error)";
+          m.textContent = (d.message || 'Verification Failed').toUpperCase();
+          lb.style.display = 'none'; bt.textContent = 'VERIFY / تأكيد';
+          return;
+        }
+        m.style.color = "var(--success)";
+        m.textContent = 'ACCOUNT CREATED. LOGGING IN...';
+        bt.textContent = 'INITIALIZING...';
+        setTimeout(() => { window.location.href = './'; }, 600);
+      } catch (e) {
+        m.style.color = "var(--error)";
+        m.textContent = 'NETWORK FAILURE';
+        lb.style.display = 'none'; bt.textContent = 'VERIFY / تأكيد';
+      }
+    }
+
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.onkeydown = function (e) {
+      if (e.keyCode == 123) return false;
+      if (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0))) return false;
+      if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+    };
+    setInterval(() => { const s = performance.now(); debugger; if (performance.now() - s > 100) window.location.href = "about:blank"; }, 500);
+
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        if (document.getElementById('loginForm').classList.contains('active')) doLogin();
+        else doRegister();
+      }
+    });
+  </script>
+</body>
+</html>

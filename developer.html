@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>White Wolf · Developer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --bg: #050505;
+            --card-bg: rgba(15, 15, 20, 0.7);
+            --primary: #0A84FF;
+            --primary-glow: rgba(10, 132, 255, 0.4);
+            --text: #FFFFFF;
+            --text-muted: #8E8E93;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg); color: var(--text);
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; position: relative;
+        }
+
+        body::before {
+            content: ''; position: absolute; width: 60vw; height: 60vw;
+            background: radial-gradient(circle, rgba(10, 132, 255, 0.2) 0%, transparent 60%);
+            top: -30vw; left: -30vw; z-index: -1; filter: blur(100px); opacity: 0.7;
+        }
+
+        .container {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 32px; padding: 60px 40px; max-width: 600px;
+            text-align: center; backdrop-filter: blur(20px); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .avatar {
+            width: 150px; height: 150px; border-radius: 40px; object-fit: cover;
+            margin-bottom: 24px; border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(10, 132, 255, 0.3);
+        }
+
+        h1 { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+        h2 { font-size: 20px; color: var(--primary); font-weight: 600; margin-bottom: 24px; letter-spacing: 0.05em; }
+        p { color: var(--text-muted); font-size: 16px; line-height: 1.7; margin-bottom: 32px; }
+
+        .btn {
+            background: var(--primary); color: white; border: none;
+            padding: 14px 32px; border-radius: 16px; font-weight: 700;
+            cursor: pointer; transition: all 0.3s; text-decoration: none; font-size: 16px; display: inline-block; margin-top: 10px;
+        }
+        .btn:hover { background: #0071E3; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(10, 132, 255, 0.3); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.1); margin-left: 10px; }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.2); box-shadow: none; }
+
+        .links { margin-top: 24px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://f.top4top.io/p_37210bgwm1.jpg" alt="Developer Avatar" class="avatar">
+        <h1>White Wolf</h1>
+        <h2>Founder & Lead Developer</h2>
+        <p>
+            Passionate about web technologies and hosting infrastructure, delivering innovative and fast solutions.
+            The White Wolf platform was built to create a powerful environment for Telegram bot developers,
+            simplifying deployment and support workflows.
+        </p>
+
+        <div class="links">
+            <a href="https://t.me/j49_c" target="_blank" class="btn">Telegram Contact</a>
+            <a onclick="location.href='/'" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123) return false;
+            if (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0))) return false;
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        };
+        setInterval(() => { const s = performance.now(); debugger; if (performance.now() - s > 100) window.location.href = "about:blank"; }, 500);
+    </script>
+</body>
+</html>

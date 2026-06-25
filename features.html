@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>استضافة الذئب | المميزات الشاملة</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
+
+        :root {
+            --bg: #050505;
+            --card-bg: rgba(20, 20, 25, 0.7);
+            --primary: #5E5CE6;
+            --primary-glow: rgba(94, 92, 230, 0.4);
+            --text: #FFFFFF;
+            --text-muted: #8E8E93;
+            --border: rgba(255, 255, 255, 0.08);
+            --success: #32D74B;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); }
+
+        nav { padding: 24px 5%; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .brand { font-weight: 800; font-size: 20px; color: white; text-decoration: none; display: flex; align-items: center; gap: 12px; }
+        .brand img { width: 40px; border-radius: 10px; }
+
+        .page-header { text-align: center; padding: 80px 20px; border-bottom: 1px solid var(--border); background: radial-gradient(circle at top, var(--primary-glow), transparent 70%); }
+        .page-header h1 { font-size: 48px; margin-bottom: 16px; font-weight: 900; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; padding: 60px 5%; max-width: 1200px; margin: 0 auto; }
+
+        .feat-card { background: var(--card-bg); border: 1px solid var(--border); padding: 40px; border-radius: 24px; transition: transform 0.3s; }
+        .feat-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .icon { font-size: 40px; margin-bottom: 24px; color: var(--primary); }
+        .feat-card h3 { font-size: 24px; margin-bottom: 12px; }
+        .feat-card p { color: var(--text-muted); line-height: 1.7; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a onclick="location.href='/'" class="brand">
+            <img src="https://f.top4top.io/p_37210bgwm1.jpg"> استضافة الذئب
+        </a>
+        <a onclick="location.href='/login'" style="color:var(--primary); font-weight:bold; text-decoration:none">ابدأ الآن</a>
+    </nav>
+
+    <div class="page-header">
+        <h1>قائمة الميزات التقنية القوية</h1>
+        <p style="color: var(--text-muted); font-size: 18px">لماذا استضافة الذئب هي خيارك الأول لبوتات التلجرام؟</p>
+    </div>
+
+    <div class="grid">
+        <div class="feat-card">
+            <div class="icon">🔌</div>
+            <h3>أنظمة Auto-Install</h3>
+            <p>لن تحتاج لتحميل المكتبات يدوياً (pip install). ستقوم الاستضافة بقراءة ملفات البايثون وتحميل أي مكتبة ناقصة فوراً لحظة التشغيل.</p>
+        </div>
+        <div class="feat-card">
+            <div class="icon">🛡️</div>
+            <h3>جدار حماية DNS</h3>
+            <p>مدمج بمنصتنا طبقة مخصصة تسمح بتمرير اتصالات تيليجرام وتجاوز أي حجب لتشغيل البوتات بثبات تام بفضل اتصالنا المباشر مع خوادم DNS.</p>
+        </div>
+        <div class="feat-card">
+            <div class="icon">📂</div>
+            <h3>مدير ملفات متكامل</h3>
+            <p>واجهة الويب توفر لك استعراض وتعديل وإنشاء وحذف الملفات. كما يمكنك رفع ملفاتك مباشرة ومتابعة سجل سيرفرك (Logs) بكل سهولة ويسر.</p>
+        </div>
+        <div class="feat-card">
+            <div class="icon">📊</div>
+            <h3>مراقب استهلاك حي</h3>
+            <p>تتبع مباشر وشامل في لوحة التحكم (RAM, CPU Usage) لاستهلاك بوتك الفعلي، مما يسمح لك بتحسين الأكواد ومعرفة كفاءتها.</p>
+        </div>
+        <div class="feat-card">
+            <div class="icon">🚀</div>
+            <h3>مدعوم بـ Gunicorn</h3>
+            <p>نعمل على بنية تحتية احترافية وليس خوادم تطويرية. البنية التحتية مبنية بتطبيقات WSGI جاهزة للعمل في وضع Production لأعلى ضغط وموثوقية.</p>
+        </div>
+        <div class="feat-card">
+            <div class="icon">🔄</div>
+            <h3>إصلاح وإقلاع ذاتي</h3>
+            <p>مراقبة تعمل بالخلفية لضمان عمل بوتك. في حالة التوقف المفاجئ سيتم إطلاق تنبيه ومحاولة الإقلاع مرة أخرى تلقائياً.</p>
+        </div>
+    </div>
+</body>
+</html>
