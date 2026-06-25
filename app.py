@@ -488,14 +488,14 @@ while True:
         if not pkg:
             traceback.print_exc()
             break
-        print(f"[AUTO] Missing: {pkg} -> installing...")
+        print(f"[AUTO] Missing: {{pkg}} -> installing...")
         try:
             subprocess.check_call([sys.executable, "-m", "pip", "install", pkg])
             append_installed(pkg)
-            print(f"[AUTO] Installed: {pkg} -> restarting...")
+            print(f"[AUTO] Installed: {{pkg}} -> restarting...")
             continue
         except Exception as ex:
-            print(f"[AUTO] Failed: {ex}")
+            print(f"[AUTO] Failed: {{ex}}")
             traceback.print_exc()
             break
     except Exception:
