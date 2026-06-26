@@ -1211,9 +1211,11 @@ def file_save(key):
     try:
         with open(full, "w", encoding="utf-8") as f:
             f.write(content)
+        threading.Thread(target=data_sync_now, daemon=True).start()
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
+
 
 
 @app.route("/files/mkdir/<path:key>", methods=["POST"])
@@ -1610,6 +1612,11 @@ def system_status():
 
 def graceful_shutdown(signum, frame):
     logger.info("Shutting down gracefully...")
+    try:
+        data_sync_now()
+        logger.info("Final backup synced.")
+    except:
+        pass
     with lock:
         for key in list(running_procs.keys()):
             stop_proc(key)
@@ -1626,12 +1633,40 @@ BACKUP_REPO_URL = f"https://{_BACKUP_TOKEN}@github.com/3MH-Technology/DATa.git"
 BACKUP_DIR = os.path.join(BASE_DIR, ".backup")
 
 def init_backup_repo():
-    if os.path.exists(os.path.join(BACKUP_DIR, ".git")):
-        subprocess.run(["git", "pull", "origin", "main", "--ff-only"], cwd=BACKUP_DIR, capture_output=True)
-        return
-    if os.path.exists(BACKUP_DIR):
-        shutil.rmtree(BACKUP_DIR)
-    subprocess.run(["git", "clone", "--depth", "1", BACKUP_REPO_URL, BACKUP_DIR], capture_output=True)
+    try:
+        if os.path.exists(os.path.join(BACKUP_DIR, ".git")):
+            subprocess.run(["git", "pull", "origin", "main", "--ff-only"], cwd=BACKUP_DIR, capture_output=True, timeout=60)
+            return
+        if os.path.exists(BACKUP_DIR):
+            shutil.rmtree(BACKUP_DIR)
+        os.makedirs(BACKUP_DIR, exist_ok=True)
+        subprocess.run(["git", "init"], cwd=BACKUP_DIR, capture_output=True, timeout=30)
+        subprocess.run(["git", "remote", "add", "origin", BACKUP_REPO_URL], cwd=BACKUP_DIR, capture_output=True, timeout=30)
+        subprocess.run(["git", "fetch", "origin", "main"], cwd=BACKUP_DIR, capture_output=True, timeout=60)
+        subprocess.run(["git", "checkout", "-t", "origin/main"], cwd=BACKUP_DIR, capture_output=True, timeout=30)
+    except:
+        try:
+            subprocess.run(["git", "clone", "--depth", "1", BACKUP_REPO_URL, BACKUP_DIR], capture_output=True, timeout=120)
+        except:
+            pass
+
+def data_sync_now():
+    try:
+        if not os.path.exists(os.path.join(BACKUP_DIR, ".git")):
+            init_backup_repo()
+        for folder in ["USERS", "DATA"]:
+            src = os.path.join(BASE_DIR, folder)
+            dst = os.path.join(BACKUP_DIR, folder)
+            if os.path.exists(src):
+                if os.path.exists(dst):
+                    shutil.rmtree(dst)
+                shutil.copytree(src, dst)
+        subprocess.run(["git", "add", "."], cwd=BACKUP_DIR, capture_output=True, timeout=30)
+        msg = f"Backup {time.strftime('%Y-%m-%d %H:%M:%S')}"
+        subprocess.run(["git", "commit", "-m", msg], cwd=BACKUP_DIR, capture_output=True, timeout=30)
+        subprocess.run(["git", "push", "origin", "main"], cwd=BACKUP_DIR, capture_output=True, timeout=120)
+    except:
+        pass
 
 def data_backup_restore():
     try:
@@ -1657,21 +1692,8 @@ def data_backup_restore():
 def run_data_sync():
     init_backup_repo()
     while True:
-        time.sleep(30)
-        try:
-            for folder in ["USERS", "DATA"]:
-                src = os.path.join(BASE_DIR, folder)
-                dst = os.path.join(BACKUP_DIR, folder)
-                if os.path.exists(src):
-                    if os.path.exists(dst):
-                        shutil.rmtree(dst)
-                    shutil.copytree(src, dst)
-            subprocess.run(["git", "add", "."], cwd=BACKUP_DIR, capture_output=True)
-            msg = f"Backup {time.strftime('%Y-%m-%d %H:%M:%S')}"
-            subprocess.run(["git", "commit", "-m", msg], cwd=BACKUP_DIR, capture_output=True)
-            subprocess.run(["git", "push", "origin", "main"], cwd=BACKUP_DIR, capture_output=True)
-        except:
-            pass
+        time.sleep(5)
+        data_sync_now()
 
 if __name__ == "__main__":
     data_backup_restore()
