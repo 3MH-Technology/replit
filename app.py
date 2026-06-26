@@ -454,7 +454,7 @@ try:
     import dns_fix
 except:
     pass
-import runpy, subprocess, traceback, re, logging
+import runpy, subprocess, traceback, re, logging, glob
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -518,11 +518,46 @@ try:
     subprocess.check_call(["ffmpeg", "-version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 except:
     print("[AUTO] ffmpeg not found -> installing...")
-    try:
-        subprocess.check_call(["apt-get", "update", "-qq"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.check_call(["apt-get", "install", "-y", "ffmpeg"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    inst = False
+    for pm, pk in [("apt-get", "ffmpeg"), ("apk", "ffmpeg"), ("yum", "ffmpeg"), ("dnf", "ffmpeg")]:
+        try:
+            subprocess.check_call(["which", pm], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            if pm == "apk":
+                subprocess.check_call([pm, "add", pk], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            elif pm == "apt-get":
+                subprocess.check_call([pm, "update", "-qq"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.check_call([pm, "install", "-y", pk], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                inst = True
+                break
+            else:
+                subprocess.check_call([pm, "install", "-y", pk], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                inst = True
+                break
+        except:
+            continue
+    if not inst:
+        try:
+            subprocess.check_call(["curl", "-sL", "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz", "-o", "/tmp/ffmpeg.tar.xz"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.check_call(["tar", "-xf", "/tmp/ffmpeg.tar.xz", "-C", "/tmp"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            for f in glob.glob("/tmp/ffmpeg-*/ffmpeg"):
+                subprocess.check_call(["cp", f, "/usr/local/bin/ffmpeg"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.check_call(["chmod", "+x", "/usr/local/bin/ffmpeg"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                inst = True
+                break
+        except:
+            try:
+                subprocess.check_call(["wget", "-q", "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz", "-O", "/tmp/ffmpeg.tar.xz"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.check_call(["tar", "-xf", "/tmp/ffmpeg.tar.xz", "-C", "/tmp"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                for f in glob.glob("/tmp/ffmpeg-*/ffmpeg"):
+                    subprocess.check_call(["cp", f, "/usr/local/bin/ffmpeg"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    subprocess.check_call(["chmod", "+x", "/usr/local/bin/ffmpeg"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    inst = True
+                    break
+            except:
+                pass
+    if inst:
         print("[AUTO] ffmpeg installed")
-    except:
+    else:
         print("[AUTO] ffmpeg install failed")
 
 while True:
