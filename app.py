@@ -514,6 +514,17 @@ try:
 except:
     pass
 
+try:
+    subprocess.check_call(["ffmpeg", "-version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+except:
+    print("[AUTO] ffmpeg not found -> installing...")
+    try:
+        subprocess.check_call(["apt-get", "update", "-qq"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.check_call(["apt-get", "install", "-y", "ffmpeg"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print("[AUTO] ffmpeg installed")
+    except:
+        print("[AUTO] ffmpeg install failed")
+
 while True:
     try:
         runpy.run_path(script, run_name="__main__")
