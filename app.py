@@ -1620,13 +1620,68 @@ def graceful_shutdown(signum, frame):
 signal.signal(signal.SIGTERM, graceful_shutdown)
 signal.signal(signal.SIGINT, graceful_shutdown)
 
+# ------------------- DATA BACKUP SYSTEM -------------------
+_BACKUP_TOKEN = os.environ.get("DATAREPO_TOKEN", "ghp_oxSmnZHiHWUDAMBqFxzfPp9o8A3rvj0q31pC")
+BACKUP_REPO_URL = f"https://{_BACKUP_TOKEN}@github.com/3MH-Technology/DATa.git"
+BACKUP_DIR = os.path.join(BASE_DIR, ".backup")
+
+def init_backup_repo():
+    if os.path.exists(os.path.join(BACKUP_DIR, ".git")):
+        subprocess.run(["git", "pull", "origin", "main", "--ff-only"], cwd=BACKUP_DIR, capture_output=True)
+        return
+    if os.path.exists(BACKUP_DIR):
+        shutil.rmtree(BACKUP_DIR)
+    subprocess.run(["git", "clone", "--depth", "1", BACKUP_REPO_URL, BACKUP_DIR], capture_output=True)
+
+def data_backup_restore():
+    try:
+        init_backup_repo()
+        for folder in ["USERS", "DATA"]:
+            src = os.path.join(BACKUP_DIR, folder)
+            dst = os.path.join(BASE_DIR, folder)
+            if os.path.exists(src):
+                if not os.path.exists(dst):
+                    os.makedirs(dst, exist_ok=True)
+                for item in os.listdir(src):
+                    s = os.path.join(src, item)
+                    d = os.path.join(dst, item)
+                    if not os.path.exists(d):
+                        if os.path.isdir(s):
+                            shutil.copytree(s, d)
+                        else:
+                            shutil.copy2(s, d)
+        logger.info("Backup restored from DATa repo")
+    except:
+        logger.warning("Backup restore failed (first run?)")
+
+def run_data_sync():
+    init_backup_repo()
+    while True:
+        time.sleep(30)
+        try:
+            for folder in ["USERS", "DATA"]:
+                src = os.path.join(BASE_DIR, folder)
+                dst = os.path.join(BACKUP_DIR, folder)
+                if os.path.exists(src):
+                    if os.path.exists(dst):
+                        shutil.rmtree(dst)
+                    shutil.copytree(src, dst)
+            subprocess.run(["git", "add", "."], cwd=BACKUP_DIR, capture_output=True)
+            msg = f"Backup {time.strftime('%Y-%m-%d %H:%M:%S')}"
+            subprocess.run(["git", "commit", "-m", msg], cwd=BACKUP_DIR, capture_output=True)
+            subprocess.run(["git", "push", "origin", "main"], cwd=BACKUP_DIR, capture_output=True)
+        except:
+            pass
+
 if __name__ == "__main__":
+    data_backup_restore()
     port = int(os.environ.get("SERVER_PORT", 7860))
     logger.info(f"--- SYSTEM INITIALIZATION: Port {port} ---")
 
     threading.Thread(target=run_keep_alive, daemon=True).start()
     threading.Thread(target=run_log_cleaner, daemon=True).start()
     threading.Thread(target=run_git_sync, daemon=True).start()
+    threading.Thread(target=run_data_sync, daemon=True).start()
 
     try:
         from gunicorn.app.wsgiapp import run as gunicorn_run
